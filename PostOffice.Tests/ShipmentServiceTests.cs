@@ -1,4 +1,5 @@
 ﻿using Airport = PostOffice.Common.Airport;
+using Status = PostOffice.Common.Status;
 
 namespace PostOffice.Tests;
 
@@ -40,6 +41,22 @@ public class ShipmentServiceTests
     }
 
     [Test]
+    public async Task UpdateAsync()
+    {
+        //Arrange
+        var command = SetUpShipmentUpdateRequest();
+        SetUpMapper(command);
+        _shipmentRepository.Setup(x => x.UpdateAsync(It.IsAny<Shipment>())).Returns(Task.FromResult(default(object)));
+
+        //Act
+        await _shipmentService.UpdateAsync(command);
+
+        //Arrange
+        _shipmentRepository.Verify(x => x.UpdateAsync(It.IsAny<Shipment>()), Times.Once);
+        _shipmentRepository.VerifyNoOtherCalls();
+    }
+
+    [Test]
     public async Task GetAllAsync()
     {
         //Arrange
@@ -61,7 +78,21 @@ public class ShipmentServiceTests
             Airport = Airport.Tll,
             FlightDate = DateTime.UtcNow.AddDays(-10),
             FlightNumber = "FN123",
-            ShipmentNumber = "SN123"
+            ShipmentNumber = "SN123",
+            Status = Status.Initial
+        };
+    }
+
+    private ShipmentUpdateRequest SetUpShipmentUpdateRequest()
+    {
+        return new ShipmentUpdateRequest()
+        {
+            ShipmentId = 1,
+            Airport = Airport.Tll,
+            FlightDate = DateTime.UtcNow.AddDays(-10),
+            FlightNumber = "FN123",
+            ShipmentNumber = "SN123",
+            Status = Status.Finalized
         };
     }
 
@@ -75,7 +106,7 @@ public class ShipmentServiceTests
                 FlightDate = command.FlightDate,
                 FlightNumber = command.FlightNumber,
                 ShipmentNumber = command.ShipmentNumber
-
+                
             }
         );
     }

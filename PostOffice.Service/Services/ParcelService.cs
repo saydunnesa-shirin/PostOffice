@@ -4,7 +4,7 @@ public interface IParcelService
     Task<IEnumerable<ParcelResponse>> GetAllAsync();
     Task<ParcelResponse> GetByIdAsync(int id);
     Task CreateAsync(ParcelRequest model);
-    Task UpdateAsync(ParcelUpdateRequest model);
+    Task UpdateAsync(ParcelRequest model);
     Task DeleteAsync(int id);
 }
 
@@ -52,7 +52,7 @@ public class ParcelService : IParcelService
         await _parcelRepository.CreateAsync(parcel);
     }
 
-    public async Task UpdateAsync(ParcelUpdateRequest model)
+    public async Task UpdateAsync(ParcelRequest model)
     {
         // copy model to Parcel and update
         var parcel = _mapper.Map<Parcel>(model);
@@ -61,6 +61,6 @@ public class ParcelService : IParcelService
 
     public async Task DeleteAsync(int id)
     {
-        await _parcelRepository.Delete(id);
+        await _parcelRepository.DeleteAsync(id);
     }
 }

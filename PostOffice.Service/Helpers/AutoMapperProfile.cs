@@ -11,7 +11,7 @@ public class AutoMapperProfile : Profile
         CreateMap<ParcelResponse, Parcel>().ReverseMap();
         CreateMap<ParcelRequest, Parcel>();
         CreateMap<ShipmentUpdateRequest, Shipment>();
-        CreateMap<BagUpdateRequest, Bag>();
-        CreateMap<ParcelUpdateRequest, Parcel>();
+        CreateMap<BagRequest, Bag>();
+        CreateMap<ParcelRequest, Parcel>();
     }
 }

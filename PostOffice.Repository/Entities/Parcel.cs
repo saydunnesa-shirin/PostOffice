@@ -21,7 +21,7 @@ public class Parcel
     [Range(0, 9999999999999999.99)]
     public decimal Price { get; set; }
 
-    public int BagId { get; set; }
+    public int? BagId { get; set; }
 
-    public Bag Bag { get; set; }
+    public Bag? Bag { get; set; }
 }

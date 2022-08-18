@@ -1,7 +1,8 @@
 ﻿namespace PostOffice.Common.Requests;
 public class BagRequest
 {
-    
+    public int BagId { get; set; }
+
     [MaxLength(15)]
     [Required]
     public string BagNumber { get; set; }
@@ -9,10 +10,7 @@ public class BagRequest
     public decimal Weight { get; set; }
     public decimal Price { get; set; }
     public int ItemCount { get; set; }
-    public int ShipmentId { get; set; }
-}
+    public int? ShipmentId { get; set; }
 
-public class BagUpdateRequest : BagRequest
-{
-    public int BagId { get; set; }
+    public List<ParcelRequest> ? ParcelRequests { get; set; }
 }

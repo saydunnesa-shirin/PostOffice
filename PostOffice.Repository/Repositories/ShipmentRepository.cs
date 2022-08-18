@@ -7,10 +7,11 @@ public class ShipmentRepository : IShipmentRepository
     {
         _context = context;
     }
-    public async Task CreateAsync(Shipment shipment)
+    public async Task<int> CreateAsync(Shipment shipment)
     {
         _context.Shipments.Add(shipment);
         await _context.SaveChangesAsync();
+        return shipment.ShipmentId;
     }
 
     public async Task DeleteAsync(int id)
@@ -23,13 +24,18 @@ public class ShipmentRepository : IShipmentRepository
 
     public async Task<IEnumerable<Shipment>> GetAllAsync()
     {
-        var shipments = _context.Shipments;
+        var shipments = _context.Shipments
+            .Include(x => x.Bags); ;
         return await shipments.ToListAsync();
     }
 
     public async Task<Shipment> GetByIdAsync(int id)
     {
-        var shipment = await _context.Shipments.FindAsync(id);
+        var shipment = await _context.Shipments
+                .Where(x => x.ShipmentId == id)
+                .Include(x => x.Bags)
+                .SingleOrDefaultAsync();
+
         if (shipment == null) throw new KeyNotFoundException("Shipment not found");
         return shipment;
     }

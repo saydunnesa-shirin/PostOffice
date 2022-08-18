@@ -13,7 +13,9 @@ public class ShipmentRequest
     public string FlightNumber { get; set; }
 
     public DateTime FlightDate { get; set; }
-    public Status Status { get; set; }
+    public Status Status { get; set; } = Status.Initial;
+
+    public List<BagRequest> ? Bags { get; set; }
 }
 
 public class ShipmentUpdateRequest : ShipmentRequest

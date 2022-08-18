@@ -1,5 +1,6 @@
 ﻿namespace PostOffice.Controllers;
 
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using PostOffice.Common.Requests;
 using PostOffice.Common.Responses;
@@ -43,7 +44,7 @@ public class BagsController : ControllerBase
     }
 
     [HttpPut]
-    public async Task UpdateAsync(BagUpdateRequest model)
+    public async Task UpdateAsync(BagRequest model)
     {
         await _bagService.UpdateAsync(model);
         _logger.LogInformation("Bag updated.");

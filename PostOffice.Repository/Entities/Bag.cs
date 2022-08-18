@@ -11,7 +11,7 @@ public class Bag
     public decimal Weight { get; set; }
     public decimal Price { get; set; }
     public int ItemCount { get; set; }
-    public int ShipmentId { get; set; }
-    public Shipment Shipment { get; set; }
+    public int? ShipmentId { get; set; }
+    public Shipment? Shipment { get; set; }
     public ICollection<Parcel> Parcels { get; set; }
 }

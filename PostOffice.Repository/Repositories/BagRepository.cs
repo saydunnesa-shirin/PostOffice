@@ -1,4 +1,6 @@
-﻿namespace PostOffice.Repository.Repositories;
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace PostOffice.Repository.Repositories;
 public class BagRepository : IBagRepository
 {
     private DataContext _context;
@@ -6,10 +8,11 @@ public class BagRepository : IBagRepository
     {
         _context = context;
     }
-    public async Task CreateAsync(Bag bag)
+    public async Task<int> CreateAsync(Bag bag)
     {
         _context.Bags.Add(bag);
         await _context.SaveChangesAsync();
+        return bag.BagId;
     }
 
     public async Task DeleteAsync(int id)
@@ -25,13 +28,26 @@ public class BagRepository : IBagRepository
 
     public async Task<IEnumerable<Bag>> GetAllAsync()
     {
-        var bags = _context.Bags;
+        var bags = _context.Bags
+            .Include(x => x.Parcels);
+
+        return await bags.ToListAsync();
+    }
+
+    public async Task<IEnumerable<Bag>> GetAllByShipmentIdAsync(int shipmentId)
+    {
+        var bags = _context.Bags.Where(q => q.ShipmentId == shipmentId);
         return await bags.ToListAsync();
     }
 
     public async Task<Bag> GetByIdAsync(int id)
     {
-        var bag = await _context.Bags.FindAsync(id);
+
+        var bag = await _context.Bags
+                .Where(x => x.BagId == id)
+                .Include(x => x.Parcels)
+                .SingleOrDefaultAsync();
+
         if (bag == null) throw new KeyNotFoundException("Bag not found");
         return bag;
     }

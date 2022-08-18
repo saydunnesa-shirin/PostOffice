@@ -13,7 +13,7 @@ public class ParcelRepository : IParcelRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task Delete(int id)
+    public async Task DeleteAsync(int id)
     {
         var parcel = await GetByIdAsync(id);
 
@@ -24,6 +24,12 @@ public class ParcelRepository : IParcelRepository
     public async Task<IEnumerable<Parcel>> GetAllAsync()
     {
         var parcels = _context.Parcels;
+        return await parcels.ToListAsync();
+    }
+
+    public async Task<IEnumerable<Parcel>> GetAllByBagIdAsync(int bagId)
+    {
+        var parcels = _context.Parcels.Where(q=>q.BagId == bagId);
         return await parcels.ToListAsync();
     }
 

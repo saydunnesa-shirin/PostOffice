@@ -1,5 +1,6 @@
 ﻿namespace PostOffice.Controllers;
 
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using PostOffice.Common.Requests;
 using PostOffice.Common.Responses;
@@ -43,7 +44,7 @@ public class ParcelsController : ControllerBase
     }
 
     [HttpPut]
-    public async Task UpdateAsync(ParcelUpdateRequest model)
+    public async Task UpdateAsync(ParcelRequest model)
     {
         await _ParcelService.UpdateAsync(model);
         _logger.LogInformation("Parcel updated.");

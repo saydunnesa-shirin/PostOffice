@@ -16,7 +16,7 @@ public class Shipment
     public DateTime FlightDate { get; set; }
 
     [Required]
-    public Status Status { get; set; }
+    public Status Status { get; set; } = Status.Initial;
 
     public ICollection<Bag> Bags { get; set; }
 

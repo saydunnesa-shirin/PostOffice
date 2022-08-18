@@ -1,8 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
+
 using PostOffice.Repository.Helpers;
 using PostOffice.Repository.Repositories;
 using PostOffice.Service.Services;
-using System.Text.Json.Serialization;
+using PostOffice.Common.Exceptions;
+using Microsoft.AspNetCore.Builder;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,7 +49,7 @@ var app = builder.Build();
         .AllowAnyHeader());
 
     //// global error handler
-    //app.UseMiddleware<ErrorHandlerMiddleware>();
+    app.UseMiddleware<ErrorHandlerMiddleware>();
 
     app.MapControllers();
 }

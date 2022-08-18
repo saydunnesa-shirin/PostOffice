@@ -1,5 +1,6 @@
 ﻿namespace PostOffice.Controllers;
 
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using PostOffice.Common.Requests;
 using PostOffice.Common.Responses;
@@ -38,6 +39,9 @@ public class ShipmentsController : ControllerBase
     [HttpPost]
     public async Task CreateAsync(ShipmentRequest model)
     {
+        ShipmentRequestValidator validation = new ShipmentRequestValidator();
+        validation.ValidateAndThrow(model);
+
         await _shipmentService.CreateAsync(model);
         _logger.LogInformation("Shipment created.");
     }

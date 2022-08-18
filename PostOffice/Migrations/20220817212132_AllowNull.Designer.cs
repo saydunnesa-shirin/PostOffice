@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PostOffice.Repository.Helpers;
 
@@ -11,9 +12,10 @@ using PostOffice.Repository.Helpers;
 namespace PostOffice.Api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220817212132_AllowNull")]
+    partial class AllowNull
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,6 +47,7 @@ namespace PostOffice.Api.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("ShipmentId")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<decimal>("Weight")
@@ -66,6 +69,7 @@ namespace PostOffice.Api.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ParcelId"), 1L, 1);
 
                     b.Property<int?>("BagId")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<string>("DestinationCountry")
@@ -135,7 +139,9 @@ namespace PostOffice.Api.Migrations
                 {
                     b.HasOne("PostOffice.Repository.Entities.Shipment", "Shipment")
                         .WithMany("Bags")
-                        .HasForeignKey("ShipmentId");
+                        .HasForeignKey("ShipmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Shipment");
                 });
@@ -144,7 +150,9 @@ namespace PostOffice.Api.Migrations
                 {
                     b.HasOne("PostOffice.Repository.Entities.Bag", "Bag")
                         .WithMany("Parcels")
-                        .HasForeignKey("BagId");
+                        .HasForeignKey("BagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Bag");
                 });
