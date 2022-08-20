@@ -37,23 +37,35 @@ public class BagsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task CreateAsync(BagRequest model)
+    public async Task<IActionResult> CreateAsync(BagRequest model)
     {
+        BagRequestValidator validation = new BagRequestValidator();
+        validation.ValidateAndThrow(model);
+
         await _bagService.CreateAsync(model);
-        _logger.LogInformation("Bag created.");
+        var successMessage = "Bag created.";
+        _logger.LogInformation(successMessage);
+        return Ok(successMessage);
     }
 
     [HttpPut]
-    public async Task UpdateAsync(BagRequest model)
+    public async Task<IActionResult> UpdateAsync(BagRequest model)
     {
+        BagRequestValidator validation = new BagRequestValidator();
+        validation.ValidateAndThrow(model);
+
         await _bagService.UpdateAsync(model);
-        _logger.LogInformation("Bag updated.");
+        var successMessage = "Bag updated.";
+        _logger.LogInformation(successMessage);
+        return Ok(successMessage);
     }
 
     [HttpDelete("{id}")]
-    public async Task DeleteAsync(int id)
+    public async Task<IActionResult> DeleteAsync(int id)
     {
         await _bagService.DeleteAsync(id);
-        _logger.LogInformation("Bag deleted.");
+        var successMessage = "Bag deleted.";
+        _logger.LogInformation(successMessage);
+        return Ok(successMessage);
     }
 }

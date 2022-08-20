@@ -7,42 +7,100 @@ public class ParcelRepository : IParcelRepository
     {
         _context = context;
     }
-    public async Task CreateAsync(Parcel parcel)
+    public async Task<int> CreateAsync(Parcel parcel)
     {
-        _context.Parcels.Add(parcel);
-        await _context.SaveChangesAsync();
+        try
+        {
+            _context.Parcels.Add(parcel);
+            await _context.SaveChangesAsync();
+            return parcel.ParcelId;
+        }
+        catch (Exception)
+        {
+            throw;
+        }
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task<bool> DeleteAsync(int id)
     {
-        var parcel = await GetByIdAsync(id);
+        try
+        {
+            var parcel = await GetByIdAsync(id);
 
-        _context.Parcels.Remove(parcel);
-        await _context.SaveChangesAsync();
+            if(parcel == null)
+                return false;
+
+            _context.Parcels.Remove(parcel);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception)
+        {
+            throw;
+        }
     }
 
-    public async Task<IEnumerable<Parcel>> GetAllAsync()
+    public async Task<IEnumerable<Parcel>> GetAllAsync(List<int> ids)
     {
-        var parcels = _context.Parcels;
-        return await parcels.ToListAsync();
+        try
+        {
+            IQueryable<Parcel> parcels;
+
+            if (ids != null && ids.Count > 0)
+            {
+                parcels = _context.Parcels.Where(x => ids.Contains(x.ParcelId));
+            }
+            else
+            {
+                parcels = _context.Parcels;
+            }
+
+            return await parcels.ToListAsync();
+        }
+        catch (Exception)
+        {
+            throw;
+        }
     }
 
     public async Task<IEnumerable<Parcel>> GetAllByBagIdAsync(int bagId)
     {
-        var parcels = _context.Parcels.Where(q=>q.BagId == bagId);
-        return await parcels.ToListAsync();
+        try
+        {
+            var parcels = _context.Parcels.Where(q => q.BagId == bagId);
+            return await parcels.ToListAsync();
+        }
+        catch (Exception)
+        {
+            throw;
+        }
     }
 
     public async Task<Parcel> GetByIdAsync(int id)
     {
-        var parcel = await _context.Parcels.FindAsync(id);
-        if (parcel == null) throw new KeyNotFoundException("Parcel not found");
-        return parcel;
+        try
+        {
+            var parcel = await _context.Parcels.FindAsync(id);
+            if (parcel == null) throw new KeyNotFoundException("Parcel not found");
+            return parcel;
+        }
+        catch (Exception)
+        {
+            throw;
+        }
     }
 
-    public async Task UpdateAsync(Parcel parcel)
+    public async Task<bool> UpdateAsync(Parcel parcel)
     {
-        _context.Parcels.Update(parcel);
-        await _context.SaveChangesAsync();
+        try
+        {
+            _context.Parcels.Update(parcel);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception)
+        {
+            throw;
+        }
     }
 }

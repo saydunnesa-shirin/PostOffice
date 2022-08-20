@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PostOffice.Repository.Entities;
 
 namespace PostOffice.Repository.Repositories;
 public class BagRepository : IBagRepository
@@ -15,47 +16,95 @@ public class BagRepository : IBagRepository
         return bag.BagId;
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task<bool> DeleteAsync(int id)
     {
-        var bag = await GetByIdAsync(id);
-
-        if(bag != null)
+        try
         {
+            var bag = await GetByIdAsync(id);
+
+            if (bag == null)
+                return false;
+
             _context.Bags.Remove(bag);
             await _context.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception)
+        {
+            throw;
         }
     }
 
-    public async Task<IEnumerable<Bag>> GetAllAsync()
+    public async Task<IEnumerable<Bag>> GetAllAsync(List<int> ids = null)
     {
-        var bags = _context.Bags
-            .Include(x => x.Parcels);
+        try
+        {
+            if (ids != null && ids.Count > 0)
+            {
+                var bags = _context.Bags.Where(x => ids.Contains(x.BagId))
+                  .Include(x => x.Parcels);
 
-        return await bags.ToListAsync();
+                return await bags.ToListAsync();
+            }
+            else
+            {
+                var bags = _context.Bags
+                .Include(x => x.Parcels);
+
+                return await bags.ToListAsync();
+            }
+        }
+        catch (Exception)
+        {
+            throw;
+        }
     }
 
     public async Task<IEnumerable<Bag>> GetAllByShipmentIdAsync(int shipmentId)
     {
-        var bags = _context.Bags.Where(q => q.ShipmentId == shipmentId);
-        return await bags.ToListAsync();
+        try
+        {
+            var bags = _context.Bags.Where(q => q.ShipmentId == shipmentId);
+            return await bags.ToListAsync();
+        }
+        catch (Exception)
+        {
+            throw;
+        }
     }
 
     public async Task<Bag> GetByIdAsync(int id)
     {
-
-        var bag = await _context.Bags
+        try
+        {
+            var bag = await _context.Bags
                 .Where(x => x.BagId == id)
                 .Include(x => x.Parcels)
                 .SingleOrDefaultAsync();
 
-        if (bag == null) throw new KeyNotFoundException("Bag not found");
-        return bag;
+            if (bag == null) throw new KeyNotFoundException("Bag not found");
+            return bag;
+        }
+        catch (Exception)
+        {
+            throw;
+        }
     }
 
-    public async Task UpdateAsync(Bag bag)
+    public async Task<bool> UpdateAsync(Bag bag)
     {
-        //_context.Entry(bag).Property(x => x.BagId).IsModified = false;
-        _context.Bags.Update(bag);
-        await _context.SaveChangesAsync();
+        try
+        {
+            var entry = _context.Bags.First(e => e.BagId == bag.BagId);
+            _context.Entry(entry).CurrentValues.SetValues(bag);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
     }
+
+    
 }

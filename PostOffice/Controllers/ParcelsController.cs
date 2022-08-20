@@ -37,23 +37,32 @@ public class ParcelsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task CreateAsync(ParcelRequest model)
+    public async Task<IActionResult> CreateAsync(ParcelRequest model)
     {
+        ParcelRequestValidator validation = new ParcelRequestValidator();
+        validation.ValidateAndThrow(model);
+
         await _ParcelService.CreateAsync(model);
-        _logger.LogInformation("Parcel created.");
+        var successMessage = "Bag created.";
+        _logger.LogInformation(successMessage);
+        return Ok(successMessage);
     }
 
     [HttpPut]
-    public async Task UpdateAsync(ParcelRequest model)
+    public async Task<IActionResult> UpdateAsync(ParcelRequest model)
     {
         await _ParcelService.UpdateAsync(model);
-        _logger.LogInformation("Parcel updated.");
+        var successMessage = "Bag updated.";
+        _logger.LogInformation(successMessage);
+        return Ok(successMessage);
     }
 
     [HttpDelete("{id}")]
-    public async Task DeleteAsync(int id)
+    public async Task<IActionResult> DeleteAsync(int id)
     {
         await _ParcelService.DeleteAsync(id);
-        _logger.LogInformation("Data deleted.");
+        var successMessage = "Bag deleted.";
+        _logger.LogInformation(successMessage);
+        return Ok(successMessage);
     }
 }

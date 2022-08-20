@@ -37,26 +37,38 @@ public class ShipmentsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task CreateAsync(ShipmentRequest model)
+    public async Task<IActionResult> CreateAsync(ShipmentRequest model)
     {
         ShipmentRequestValidator validation = new ShipmentRequestValidator();
         validation.ValidateAndThrow(model);
 
         await _shipmentService.CreateAsync(model);
-        _logger.LogInformation("Shipment created.");
+        var successMessage = "Shipment created.";
+        _logger.LogInformation(successMessage);
+        return Ok(successMessage);
     }
 
     [HttpPut]
-    public async Task UpdateAsync(ShipmentUpdateRequest model)
+    public async Task<IActionResult> UpdateAsync(ShipmentUpdateRequest model)
     {
+        ShipmentRequestValidator validation = new ShipmentRequestValidator();
+        validation.ValidateAndThrow(model);
+
         await _shipmentService.UpdateAsync(model);
-        _logger.LogInformation("Shipment updated.");
+
+        var successMessage = "Shipment updated.";
+        _logger.LogInformation(successMessage);
+        return Ok(successMessage);
+
     }
 
     [HttpDelete("{id}")]
-    public async Task DeleteAsync(int id)
+    public async Task<IActionResult> DeleteAsync(int id)
     {
         await _shipmentService.DeleteAsync(id);
-        _logger.LogInformation("Shipment deleted.");
+
+        var successMessage = "Shipment deleted.";
+        _logger.LogInformation(successMessage);
+        return Ok(successMessage);
     }
 }

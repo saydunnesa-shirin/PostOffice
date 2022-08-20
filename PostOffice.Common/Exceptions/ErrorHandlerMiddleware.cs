@@ -42,6 +42,10 @@ public class ErrorHandlerMiddleware
                     // not found error
                     response.StatusCode = (int)HttpStatusCode.NotFound;
                     break;
+                case ValidationException e:
+                    response.StatusCode = (int)HttpStatusCode.NotAcceptable;
+                    break;
+                
                 default:
                     // unhandled error
                     _logger.LogError(error, error.Message);

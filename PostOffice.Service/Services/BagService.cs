@@ -60,14 +60,14 @@ public class BagService : IBagService
         // save Bag
         var bagId = await _bagRepository.CreateAsync(bag);
 
-        if(bagId > 0 && model.ParcelRequests != null && model.ParcelRequests.Count > 0)
+        // update parcels
+        if (bagId > 0 && model.ParcelIds != null && model.ParcelIds.Count > 0)
         {
-            foreach (var parcelRequest in model.ParcelRequests)
+            foreach (var parcelId in model.ParcelIds)
             {
-                var parcel = _mapper.Map<Parcel>(parcelRequest);
-
+                var parcel = await _parcelRepository.GetByIdAsync(parcelId);
                 parcel.BagId = bagId;
-                await _parcelRepository.CreateAsync(parcel);
+                await _parcelRepository.UpdateAsync(parcel);
             }
         }
     }
@@ -76,29 +76,32 @@ public class BagService : IBagService
     {
         if (model == null) throw new ArgumentNullException("model");
 
-        if(!IsValid(model.ShipmentId ?? 0))
+        var shipmentId = model.ShipmentId > 0? model.ShipmentId : 0;
+        if (!IsValid(shipmentId ?? 0))
             return;
 
         // copy model to Bag and update
         var bag = _mapper.Map<Bag>(model);
-        await _bagRepository.UpdateAsync(bag);
+        var result = await _bagRepository.UpdateAsync(bag);
 
-        if (model.ParcelRequests != null && model.ParcelRequests.Count > 0)
+        if (result && model.ParcelIds != null && model.ParcelIds.Count > 0)
         {
-            var parcels = await _parcelRepository.GetAllByBagIdAsync(model.BagId);
+            var existingParcels = await _parcelRepository.GetAllByBagIdAsync(model.BagId);
 
-            var newParcels = model.ParcelRequests.Where(q => q.ParcelId == 0).ToList();
+            var parcels = await _parcelRepository.GetAllAsync(model.ParcelIds);
 
-            foreach (var parcelRequest in newParcels)
+            var existingParcelIds = existingParcels.Select(x => x.ParcelId).ToList();
+
+            var parcelsToAdd = parcels.Except(existingParcels).ToList();
+            var parcelsToRemove = existingParcels.Except(parcels).ToList();
+
+            foreach (var parcel in parcelsToAdd)
             {
-                var parcel = _mapper.Map<Parcel>(parcelRequest);
                 parcel.BagId = model.BagId;
-                await _parcelRepository.CreateAsync(parcel);
+                await _parcelRepository.UpdateAsync(parcel);
             }
 
-            var excludeParcels = parcels.Where(q => model.ParcelRequests.Any(p => p.ParcelId > 0 && p.ParcelId != q.ParcelId)).ToList();
-
-            foreach (var parcel in excludeParcels)
+            foreach (var parcel in parcelsToRemove)
             {
                 parcel.BagId = null;
                 await _parcelRepository.UpdateAsync(parcel);
@@ -117,13 +120,14 @@ public class BagService : IBagService
 
         foreach (var parcel in parcels)
         {
-            await _parcelRepository.DeleteAsync(parcel.ParcelId);
+            parcel.BagId = null;
+            await _parcelRepository.UpdateAsync(parcel);
         }
 
         await _bagRepository.DeleteAsync(id);
     }
 
-    public bool IsValid(int shipmentId)
+    public bool IsValid(int shipmentId = 0)
     {
         if(shipmentId > 0)
         {

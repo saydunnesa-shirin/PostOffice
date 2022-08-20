@@ -7,14 +7,16 @@ public class ShipmentServiceTests
 {
     private readonly Mock<IMapper> _mapper;
     private readonly Mock<IShipmentRepository> _shipmentRepository;
+    private readonly Mock<IBagRepository>  _bagRepository;
     private readonly IShipmentService _shipmentService;
 
-    public ShipmentServiceTests()
+    public ShipmentServiceTests(Mock<IBagRepository> bagRepository)
     {
-        _shipmentRepository = new Mock<IShipmentRepository>();
         _mapper = new Mock<IMapper>();
+        _shipmentRepository = new Mock<IShipmentRepository>();
+        _bagRepository = new Mock<IBagRepository>();
 
-        _shipmentService = new ShipmentService(_shipmentRepository.Object, _mapper.Object);
+        _shipmentService = new ShipmentService(_mapper.Object, _shipmentRepository.Object, _bagRepository.Object);
     }
 
     [SetUp]
@@ -30,7 +32,7 @@ public class ShipmentServiceTests
         //Arrange
         var command = SetUpShipmentRequest();
         SetUpMapper(command);
-        _shipmentRepository.Setup(x => x.CreateAsync(It.IsAny<Shipment>())).Returns(Task.FromResult(default(object)));
+        _shipmentRepository.Setup(x => x.CreateAsync(It.IsAny<Shipment>())).Returns(It.IsAny<int>);
             
         //Act
         await _shipmentService.CreateAsync(command);
@@ -46,7 +48,7 @@ public class ShipmentServiceTests
         //Arrange
         var command = SetUpShipmentUpdateRequest();
         SetUpMapper(command);
-        _shipmentRepository.Setup(x => x.UpdateAsync(It.IsAny<Shipment>())).Returns(Task.FromResult(default(object)));
+        _shipmentRepository.Setup(x => x.UpdateAsync(It.IsAny<Shipment>())).Returns(It.IsAny<bool>);
 
         //Act
         await _shipmentService.UpdateAsync(command);

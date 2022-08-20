@@ -2,10 +2,10 @@
 
 public interface IParcelRepository
 {
-    Task<IEnumerable<Parcel>> GetAllAsync();
+    Task<IEnumerable<Parcel>> GetAllAsync(List<int> ids = null);
     Task<Parcel> GetByIdAsync(int id);
     Task<IEnumerable<Parcel>> GetAllByBagIdAsync(int bagId);
-    Task CreateAsync(Parcel model);
-    Task UpdateAsync(Parcel model);
-    Task DeleteAsync(int id);
+    Task<int> CreateAsync(Parcel model);
+    Task<bool> UpdateAsync(Parcel model);
+    Task<bool> DeleteAsync(int id);
 }

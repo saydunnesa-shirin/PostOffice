@@ -9,40 +9,80 @@ public class ShipmentRepository : IShipmentRepository
     }
     public async Task<int> CreateAsync(Shipment shipment)
     {
-        _context.Shipments.Add(shipment);
-        await _context.SaveChangesAsync();
-        return shipment.ShipmentId;
+        try
+        {
+            _context.Shipments.Add(shipment);
+            await _context.SaveChangesAsync();
+            return shipment.ShipmentId;
+        }
+        catch (Exception)
+        {
+            throw;
+        }
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task<bool> DeleteAsync(int id)
     {
-        var shipment = await GetByIdAsync(id);
+        try
+        {
+            var shipment = await GetByIdAsync(id);
 
-        _context.Shipments.Remove(shipment);
-        await _context.SaveChangesAsync();
+            if(shipment == null)
+                return false;
+            _context.Shipments.Remove(shipment);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception)
+        {
+            throw;
+        }
     }
 
     public async Task<IEnumerable<Shipment>> GetAllAsync()
     {
-        var shipments = _context.Shipments
-            .Include(x => x.Bags); ;
-        return await shipments.ToListAsync();
+        try
+        {
+            var shipments = _context.Shipments
+            .Include(x => x.Bags);
+            return await shipments.ToListAsync();
+        }
+        catch (Exception)
+        {
+            throw;
+        }
     }
 
     public async Task<Shipment> GetByIdAsync(int id)
     {
-        var shipment = await _context.Shipments
+        try
+        {
+            var shipment = await _context.Shipments
                 .Where(x => x.ShipmentId == id)
                 .Include(x => x.Bags)
                 .SingleOrDefaultAsync();
 
-        if (shipment == null) throw new KeyNotFoundException("Shipment not found");
-        return shipment;
+            if (shipment == null) throw new KeyNotFoundException("Shipment not found");
+            return shipment;
+        }
+        catch (Exception)
+        {
+            throw;
+        }
     }
 
-    public async Task UpdateAsync(Shipment shipment)
+    public async Task<bool> UpdateAsync(Shipment shipment)
     {
-        _context.Shipments.Update(shipment);
-        await _context.SaveChangesAsync();
+        try
+        {
+            var entry = _context.Shipments.First(e => e.ShipmentId == shipment.ShipmentId);
+            _context.Entry(entry).CurrentValues.SetValues(shipment);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 }

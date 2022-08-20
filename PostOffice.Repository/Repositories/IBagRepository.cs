@@ -2,10 +2,10 @@
 
 public interface IBagRepository
 {
-    Task<IEnumerable<Bag>> GetAllAsync();
+    Task<IEnumerable<Bag>> GetAllAsync(List<int> ids = null);
     Task<Bag> GetByIdAsync(int id);
     Task<IEnumerable<Bag>> GetAllByShipmentIdAsync(int shipmentId);
     Task<int> CreateAsync(Bag model);
-    Task UpdateAsync(Bag model);
-    Task DeleteAsync(int id);
+    Task<bool> UpdateAsync(Bag model);
+    Task<bool> DeleteAsync(int id);
 }
