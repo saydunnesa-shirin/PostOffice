@@ -1,3 +1,6 @@
+using System.Transactions;
+using static System.Formats.Asn1.AsnWriter;
+
 namespace PostOffice.Service.Services;
 public interface IShipmentService
 {
@@ -50,82 +53,119 @@ public class ShipmentService : IShipmentService
     {
         if (model == null) throw new ArgumentNullException("model");
 
-        // map model to new Shipment object
-        model.FlightDate = Convert.ToDateTime(model.FlightDate);
-        var shipment = _mapper.Map<Shipment>(model);
-
-        // save Shipment
-        var shipmentId = await _shipmentRepository.CreateAsync(shipment);
-
-        if (shipmentId > 0 && model.BagIds != null && model.BagIds.Count > 0)
+        using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
-            foreach (var bagId in model.BagIds)
+            try
             {
-                var bag = await _bagRepository.GetByIdAsync(bagId);
-                bag.ShipmentId = shipmentId;
-                await _bagRepository.UpdateAsync(bag);
+                // map model to new Shipment object
+                model.FlightDate = Convert.ToDateTime(model.FlightDate);
+                var shipment = _mapper.Map<Shipment>(model);
+
+                // save Shipment
+                var shipmentId = await _shipmentRepository.CreateAsync(shipment);
+
+                if (shipmentId > 0 && model.BagIds != null && model.BagIds.Count > 0)
+                {
+                    foreach (var bagId in model.BagIds)
+                    {
+                        var bag = await _bagRepository.GetByIdAsync(bagId);
+                        bag.ShipmentId = shipmentId;
+                        await _bagRepository.UpdateAsync(bag);
+                    }
+                }
+
+                transaction.Complete();
+                return shipmentId;
+            }
+            catch (Exception)
+            {
+                transaction.Dispose();
+                throw;
             }
         }
-
-        return shipmentId;
     }
 
     public async Task<bool> UpdateAsync(ShipmentUpdateRequest model)
     {
         if (model == null) throw new ArgumentNullException("model");
 
-        var isValid = await IsValid(model);
-        if (!isValid)
-            return false;
-        // copy model to Shipment and update
-        model.FlightDate = Convert.ToDateTime(model.FlightDate);
-        var shipment = _mapper.Map<Shipment>(model);
-        var result = await _shipmentRepository.UpdateAsync(shipment);
-
-        if (result && model.BagIds != null && model.BagIds.Count > 0)
+        using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
-            var existingBags = await _bagRepository.GetAllByShipmentIdAsync(model.ShipmentId);
-
-            var bags = await _bagRepository.GetAllAsync(model.BagIds);
-            
-            var existingBagIds = existingBags.Select(x => x.BagId).ToList();
-
-            var bagsToAdd = bags.Except(existingBags).ToList();
-            var bagsToRemove = existingBags.Except(bags).ToList();
-
-            foreach (var bag in bagsToAdd)
+            try
             {
-                bag.ShipmentId = model.ShipmentId;
-                result = await _bagRepository.UpdateAsync(bag);
+                var isValid = await IsValid(model);
+                if (!isValid)
+                    return false;
+                // copy model to Shipment and update
+                model.FlightDate = Convert.ToDateTime(model.FlightDate);
+                var shipment = _mapper.Map<Shipment>(model);
+                var result = await _shipmentRepository.UpdateAsync(shipment);
+
+                if (result && model.BagIds != null && model.BagIds.Count > 0)
+                {
+                    var existingBags = await _bagRepository.GetAllByShipmentIdAsync(model.ShipmentId);
+
+                    var bags = await _bagRepository.GetAllAsync(model.BagIds);
+
+                    var existingBagIds = existingBags.Select(x => x.BagId).ToList();
+
+                    var bagsToAdd = bags.Except(existingBags).ToList();
+                    var bagsToRemove = existingBags.Except(bags).ToList();
+
+                    foreach (var bag in bagsToAdd)
+                    {
+                        bag.ShipmentId = model.ShipmentId;
+                        result = await _bagRepository.UpdateAsync(bag);
+                    }
+
+                    foreach (var bag in bagsToRemove)
+                    {
+                        bag.ShipmentId = null;
+                        result = await _bagRepository.UpdateAsync(bag);
+                    }
+                }
+
+                transaction.Complete();
+
+                return result;
             }
-
-            foreach (var bag in bagsToRemove)
+            catch (Exception)
             {
-                bag.ShipmentId = null;
-                result = await _bagRepository.UpdateAsync(bag);
+                transaction.Dispose();
+                throw;
             }
         }
-
-        return result;
     }
 
     public async Task<bool> DeleteAsync(int id)
     {
-        var shipment = await _shipmentRepository.GetByIdAsync(id);
-
-        if (shipment != null && shipment.Status == Status.Finalized)
-            return false;
-
-        var bags = await _bagRepository.GetAllByShipmentIdAsync(id);
-
-        foreach (var bag in bags)
+        using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
-            bag.ShipmentId = null;
+            try
+            {
+                var shipment = await _shipmentRepository.GetByIdAsync(id);
 
-            await _bagRepository.UpdateAsync(bag);
+                if (shipment != null && shipment.Status == Status.Finalized)
+                    return false;
+
+                var bags = await _bagRepository.GetAllByShipmentIdAsync(id);
+
+                foreach (var bag in bags)
+                {
+                    bag.ShipmentId = null;
+
+                    await _bagRepository.UpdateAsync(bag);
+                }
+
+                transaction.Complete();
+                return await _shipmentRepository.DeleteAsync(id);
+            }
+            catch (Exception)
+            {
+                transaction.Dispose();
+                throw;
+            }
         }
-
-        return await _shipmentRepository.DeleteAsync(id);
     }
 
     public async Task<bool> IsValid(ShipmentUpdateRequest model)
