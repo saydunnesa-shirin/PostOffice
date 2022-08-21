@@ -149,7 +149,7 @@ public class BagService : IBagService
         if(bag.ContentType == Common.ContentType.Letter && bag.ParcelIds != null && bag.ParcelIds.Count > 0)
             return false;
 
-        if (bag.ContentType == Common.ContentType.Parcel && bag.ParcelIds == null || (bag.ParcelIds != null && bag.ParcelIds.Count == 0))
+        if (bag.ContentType == Common.ContentType.Parcel && (bag.ParcelIds == null || (bag.ParcelIds != null && bag.ParcelIds.Count == 0)))
             return false;
 
 
