@@ -63,6 +63,41 @@ public class BagServiceTests
     }
 
     [Test]
+    public async Task UpdateAsync_ContentTypeLetter_Fail()
+    {
+        //Arrange
+        var command = SetUpBagUpdateRequest();
+        command.ContentType = ContentType.Letter;
+        command.ParcelIds = new List<int> {1,2};
+        SetUpMapper(command);
+        _bagRepository.Setup(x => x.UpdateAsync(It.IsAny<Bag>())).ReturnsAsync(false);
+
+        //Act
+        var result = await _shipmentService.UpdateAsync(command);
+
+        //Arrange
+        _bagRepository.Verify(x => x.UpdateAsync(It.IsAny<Bag>()), Times.Never);
+        Assert.AreEqual(false, result);
+    }
+
+    [Test]
+    public async Task UpdateAsync_ContentTypeParcel_Fail()
+    {
+        //Arrange
+        var command = SetUpBagUpdateRequest();
+        command.ContentType = ContentType.Parcel;
+        SetUpMapper(command);
+        _bagRepository.Setup(x => x.UpdateAsync(It.IsAny<Bag>())).ReturnsAsync(false);
+
+        //Act
+        var result = await _shipmentService.UpdateAsync(command);
+
+        //Arrange
+        _bagRepository.Verify(x => x.UpdateAsync(It.IsAny<Bag>()), Times.Never);
+        Assert.AreEqual(false, result);
+    }
+
+    [Test]
     public async Task GetAllAsync()
     {
         //Arrange

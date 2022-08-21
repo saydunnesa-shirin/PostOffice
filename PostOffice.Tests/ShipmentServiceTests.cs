@@ -61,6 +61,39 @@ public class ShipmentServiceTests
     }
 
     [Test]
+    public async Task UpdateAsync_StatusFinalize_Pass()
+    {
+        //Arrange
+        var command = SetUpShipmentUpdateRequest();
+        SetUpMapper(command);
+        command.Status = Status.Finalized;
+        command.BagIds = new List<int> { 1, 2 };
+        _shipmentRepository.Setup(x => x.UpdateAsync(It.IsAny<Shipment>())).ReturnsAsync(true);
+
+        //Act
+        await _shipmentService.UpdateAsync(command);
+
+        //Arrange
+        _shipmentRepository.Verify(x => x.UpdateAsync(It.IsAny<Shipment>()), Times.Once);
+    }
+
+    [Test]
+    public async Task UpdateAsync_StatusFinalizeWithEmptyBags_Fail()
+    {
+        //Arrange
+        var command = SetUpShipmentUpdateRequest();
+        SetUpMapper(command);
+        command.Status = Status.Finalized;
+        _shipmentRepository.Setup(x => x.UpdateAsync(It.IsAny<Shipment>())).ReturnsAsync(true);
+
+        //Act
+        await _shipmentService.UpdateAsync(command);
+
+        //Arrange
+        _shipmentRepository.Verify(x => x.UpdateAsync(It.IsAny<Shipment>()), Times.Never);
+    }
+
+    [Test]
     public async Task GetAllAsync()
     {
         //Arrange
@@ -95,7 +128,7 @@ public class ShipmentServiceTests
             FlightDate = DateTime.UtcNow.AddDays(-10),
             FlightNumber = "FN123",
             ShipmentNumber = "SN123",
-            Status = Status.Finalized
+            Status = Status.Initial
         };
     }
 

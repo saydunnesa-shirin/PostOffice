@@ -42,10 +42,20 @@ public class ShipmentsController : ControllerBase
         ShipmentRequestValidator validation = new ShipmentRequestValidator();
         validation.ValidateAndThrow(model);
 
-        await _shipmentService.CreateAsync(model);
-        var successMessage = "Shipment created.";
-        _logger.LogInformation(successMessage);
-        return Ok(successMessage);
+        var result = await _shipmentService.CreateAsync(model);
+
+        string message;
+
+        if (result > 0)
+        {
+            message = "Shipment created.";
+            _logger.LogInformation(message);
+            return Ok(message);
+        }
+
+        message = "Failed to create shipment.";
+        _logger.LogInformation(message);
+        return BadRequest(message);
     }
 
     [HttpPut]
@@ -54,21 +64,38 @@ public class ShipmentsController : ControllerBase
         ShipmentRequestValidator validation = new ShipmentRequestValidator();
         validation.ValidateAndThrow(model);
 
-        await _shipmentService.UpdateAsync(model);
+        var result = await _shipmentService.UpdateAsync(model);
 
-        var successMessage = "Shipment updated.";
-        _logger.LogInformation(successMessage);
-        return Ok(successMessage);
+        string message;
 
+        if (result == true)
+        {
+            message = "Shipment updated.";
+            _logger.LogInformation(message);
+            return Ok(message);
+        }
+
+        message = "Failed to update shipment.";
+        _logger.LogInformation(message);
+        return BadRequest(message);
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAsync(int id)
     {
-        await _shipmentService.DeleteAsync(id);
+        var result = await _shipmentService.DeleteAsync(id);
 
-        var successMessage = "Shipment deleted.";
-        _logger.LogInformation(successMessage);
-        return Ok(successMessage);
+        string message;
+
+        if (result == true)
+        {
+            message = "Shipment deleted.";
+            _logger.LogInformation(message);
+            return Ok(message);
+        }
+
+        message = "Failed to delete shipment.";
+        _logger.LogInformation(message);
+        return BadRequest(message);
     }
 }

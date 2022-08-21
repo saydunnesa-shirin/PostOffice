@@ -42,10 +42,19 @@ public class BagsController : ControllerBase
         BagRequestValidator validation = new BagRequestValidator();
         validation.ValidateAndThrow(model);
 
-        await _bagService.CreateAsync(model);
-        var successMessage = "Bag created.";
-        _logger.LogInformation(successMessage);
-        return Ok(successMessage);
+        var result = await _bagService.CreateAsync(model);
+        string message;
+
+        if (result > 0)
+        {
+            message = "Bag created.";
+            _logger.LogInformation(message);
+            return Ok(message);
+        }
+
+        message = "Failed to create bag.";
+        _logger.LogInformation(message);
+        return BadRequest(message);
     }
 
     [HttpPut]
@@ -54,18 +63,36 @@ public class BagsController : ControllerBase
         BagRequestValidator validation = new BagRequestValidator();
         validation.ValidateAndThrow(model);
 
-        await _bagService.UpdateAsync(model);
-        var successMessage = "Bag updated.";
-        _logger.LogInformation(successMessage);
-        return Ok(successMessage);
+        var result = await _bagService.UpdateAsync(model);
+        string message;
+
+        if (result == true)
+        {
+            message = "Bag updated.";
+            _logger.LogInformation(message);
+            return Ok(message);
+        }
+
+        message = "Failed to update bag.";
+        _logger.LogInformation(message);
+        return BadRequest(message);
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAsync(int id)
     {
-        await _bagService.DeleteAsync(id);
-        var successMessage = "Bag deleted.";
-        _logger.LogInformation(successMessage);
-        return Ok(successMessage);
+        var result = await _bagService.DeleteAsync(id);
+        string message;
+
+        if (result == true)
+        {
+            message = "Bag deleted.";
+            _logger.LogInformation(message);
+            return Ok(message);
+        }
+
+        message = "Failed to delete bag.";
+        _logger.LogInformation(message);
+        return BadRequest(message);
     }
 }

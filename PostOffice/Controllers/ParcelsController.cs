@@ -42,27 +42,55 @@ public class ParcelsController : ControllerBase
         ParcelRequestValidator validation = new ParcelRequestValidator();
         validation.ValidateAndThrow(model);
 
-        await _ParcelService.CreateAsync(model);
-        var successMessage = "Bag created.";
-        _logger.LogInformation(successMessage);
-        return Ok(successMessage);
+        var result = await _ParcelService.CreateAsync(model);
+
+        string message;
+
+        if (result > 0)
+        {
+            message = "Parcel created.";
+            _logger.LogInformation(message);
+            return Ok(message);
+        }
+
+        message = "Failed to create parcel.";
+        _logger.LogInformation(message);
+        return BadRequest(message);
     }
 
     [HttpPut]
     public async Task<IActionResult> UpdateAsync(ParcelRequest model)
     {
-        await _ParcelService.UpdateAsync(model);
-        var successMessage = "Bag updated.";
-        _logger.LogInformation(successMessage);
-        return Ok(successMessage);
+        var result = await _ParcelService.UpdateAsync(model);
+        string message;
+
+        if (result == true)
+        {
+            message = "Parcel updated.";
+            _logger.LogInformation(message);
+            return Ok(message);
+        }
+
+        message = "Failed to update parcel.";
+        _logger.LogInformation(message);
+        return BadRequest(message);
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAsync(int id)
     {
-        await _ParcelService.DeleteAsync(id);
-        var successMessage = "Bag deleted.";
-        _logger.LogInformation(successMessage);
-        return Ok(successMessage);
+        var result = await _ParcelService.DeleteAsync(id);
+        string message;
+
+        if (result == true)
+        {
+            message = "Parcel deleted.";
+            _logger.LogInformation(message);
+            return Ok(message);
+        }
+
+        message = "Failed to delete parcel.";
+        _logger.LogInformation(message);
+        return BadRequest(message);
     }
 }

@@ -38,5 +38,14 @@ public class DataContext : DbContext
         modelBuilder.Entity<Shipment>()
            .HasAlternateKey(c => c.ShipmentNumber)
            .HasName("AlternateKey_ShipmentNumber");
+
+        modelBuilder.Entity<Bag>()
+           .HasAlternateKey(c => c.BagNumber)
+           .HasName("AlternateKey_BagNumber");
+
+        modelBuilder.Entity<Parcel>()
+           .HasAlternateKey(c => c.ParcelNumber)
+           .HasName("AlternateKey_ParcelNumber");
+
     }
 }

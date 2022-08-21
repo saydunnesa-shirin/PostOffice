@@ -1,16 +1,11 @@
-using PostOffice.Common.Requests;
-using PostOffice.Repository.Entities;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-
 namespace PostOffice.Service.Services;
 public interface IShipmentService
 {
     Task<IEnumerable<ShipmentResponse>> GetAllAsync();
     Task<ShipmentResponse> GetByIdAsync(int id);
     Task<int> CreateAsync(ShipmentRequest model);
-    Task UpdateAsync(ShipmentUpdateRequest model);
-    Task DeleteAsync(int id);
+    Task<bool> UpdateAsync(ShipmentUpdateRequest model);
+    Task<bool> DeleteAsync(int id);
 }
 
 public class ShipmentService : IShipmentService
@@ -75,13 +70,13 @@ public class ShipmentService : IShipmentService
         return shipmentId;
     }
 
-    public async Task UpdateAsync(ShipmentUpdateRequest model)
+    public async Task<bool> UpdateAsync(ShipmentUpdateRequest model)
     {
         if (model == null) throw new ArgumentNullException("model");
 
-        var isValid = await IsValid(model.ShipmentId);
+        var isValid = await IsValid(model);
         if (!isValid)
-            return;
+            return false;
         // copy model to Shipment and update
         model.FlightDate = Convert.ToDateTime(model.FlightDate);
         var shipment = _mapper.Map<Shipment>(model);
@@ -101,22 +96,25 @@ public class ShipmentService : IShipmentService
             foreach (var bag in bagsToAdd)
             {
                 bag.ShipmentId = model.ShipmentId;
-                await _bagRepository.UpdateAsync(bag);
+                result = await _bagRepository.UpdateAsync(bag);
             }
 
             foreach (var bag in bagsToRemove)
             {
                 bag.ShipmentId = null;
-                await _bagRepository.UpdateAsync(bag);
+                result = await _bagRepository.UpdateAsync(bag);
             }
         }
+
+        return result;
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task<bool> DeleteAsync(int id)
     {
-        var isValid = await IsValid(id);
-        if (!isValid)
-            return;
+        var shipment = await _shipmentRepository.GetByIdAsync(id);
+
+        if (shipment != null && shipment.Status == Status.Finalized)
+            return false;
 
         var bags = await _bagRepository.GetAllByShipmentIdAsync(id);
 
@@ -127,16 +125,19 @@ public class ShipmentService : IShipmentService
             await _bagRepository.UpdateAsync(bag);
         }
 
-        await _shipmentRepository.DeleteAsync(id);
+        return await _shipmentRepository.DeleteAsync(id);
     }
 
-    public async Task<bool> IsValid(int shipmentId)
+    public async Task<bool> IsValid(ShipmentUpdateRequest model)
     {
-        if (shipmentId > 0)
+        if (model.ShipmentId > 0)
         {
-            var shipment = await _shipmentRepository.GetByIdAsync(shipmentId);
+            var shipment = await _shipmentRepository.GetByIdAsync(model.ShipmentId);
 
             if (shipment != null && shipment.Status == Status.Finalized)
+                return false;
+
+            if (model.Status == Common.Status.Finalized && (model.BagIds == null || model.BagIds != null && model.BagIds.Count == 0))
                 return false;
         }
 
