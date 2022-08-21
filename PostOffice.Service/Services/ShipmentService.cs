@@ -8,7 +8,7 @@ public interface IShipmentService
 {
     Task<IEnumerable<ShipmentResponse>> GetAllAsync();
     Task<ShipmentResponse> GetByIdAsync(int id);
-    Task CreateAsync(ShipmentRequest model);
+    Task<int> CreateAsync(ShipmentRequest model);
     Task UpdateAsync(ShipmentUpdateRequest model);
     Task DeleteAsync(int id);
 }
@@ -51,7 +51,7 @@ public class ShipmentService : IShipmentService
         return shipmentModel;
     }
 
-    public async Task CreateAsync(ShipmentRequest model)
+    public async Task<int> CreateAsync(ShipmentRequest model)
     {
         if (model == null) throw new ArgumentNullException("model");
 
@@ -71,6 +71,8 @@ public class ShipmentService : IShipmentService
                 await _bagRepository.UpdateAsync(bag);
             }
         }
+
+        return shipmentId;
     }
 
     public async Task UpdateAsync(ShipmentUpdateRequest model)

@@ -6,7 +6,7 @@ public interface IBagService
 {
     Task<IEnumerable<BagResponse>> GetAllAsync();
     Task<BagResponse> GetByIdAsync(int id);
-    Task CreateAsync(BagRequest model);
+    Task<int> CreateAsync(BagRequest model);
     Task UpdateAsync(BagRequest model);
     Task DeleteAsync(int id);
 }
@@ -50,7 +50,7 @@ public class BagService : IBagService
         return response;
     }
 
-    public async Task CreateAsync(BagRequest model)
+    public async Task<int> CreateAsync(BagRequest model)
     {
         if (model == null) throw new ArgumentNullException("model");
 
@@ -70,6 +70,8 @@ public class BagService : IBagService
                 await _parcelRepository.UpdateAsync(parcel);
             }
         }
+
+        return bagId;
     }
 
     public async Task UpdateAsync(BagRequest model)

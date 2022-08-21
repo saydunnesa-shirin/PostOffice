@@ -10,7 +10,7 @@ public class ShipmentServiceTests
     private readonly Mock<IBagRepository>  _bagRepository;
     private readonly IShipmentService _shipmentService;
 
-    public ShipmentServiceTests(Mock<IBagRepository> bagRepository)
+    public ShipmentServiceTests()
     {
         _mapper = new Mock<IMapper>();
         _shipmentRepository = new Mock<IShipmentRepository>();
@@ -24,6 +24,7 @@ public class ShipmentServiceTests
     {
         _mapper.Reset();
         _shipmentRepository.Reset();
+        _bagRepository.Reset();
     }
 
     [Test]
@@ -32,14 +33,16 @@ public class ShipmentServiceTests
         //Arrange
         var command = SetUpShipmentRequest();
         SetUpMapper(command);
-        _shipmentRepository.Setup(x => x.CreateAsync(It.IsAny<Shipment>())).Returns(It.IsAny<int>);
-            
+        var shipmentId = 1;
+        _shipmentRepository.Setup(x => x.CreateAsync(It.IsAny<Shipment>())).ReturnsAsync(shipmentId);
+
         //Act
-        await _shipmentService.CreateAsync(command);
+        var result = await _shipmentService.CreateAsync(command);
 
         //Arrange
         _shipmentRepository.Verify(x => x.CreateAsync(It.IsAny<Shipment>()), Times.Once);
         _shipmentRepository.VerifyNoOtherCalls();
+        Assert.AreEqual(shipmentId, result);
     }
 
     [Test]
@@ -48,14 +51,13 @@ public class ShipmentServiceTests
         //Arrange
         var command = SetUpShipmentUpdateRequest();
         SetUpMapper(command);
-        _shipmentRepository.Setup(x => x.UpdateAsync(It.IsAny<Shipment>())).Returns(It.IsAny<bool>);
+        _shipmentRepository.Setup(x => x.UpdateAsync(It.IsAny<Shipment>())).ReturnsAsync(true);
 
         //Act
         await _shipmentService.UpdateAsync(command);
 
         //Arrange
         _shipmentRepository.Verify(x => x.UpdateAsync(It.IsAny<Shipment>()), Times.Once);
-        _shipmentRepository.VerifyNoOtherCalls();
     }
 
     [Test]
@@ -84,7 +86,6 @@ public class ShipmentServiceTests
             Status = Status.Initial
         };
     }
-
     private ShipmentUpdateRequest SetUpShipmentUpdateRequest()
     {
         return new ShipmentUpdateRequest()
@@ -112,7 +113,6 @@ public class ShipmentServiceTests
             }
         );
     }
-
     private IEnumerable<Shipment> GetShipments()
     {
         return new List<Shipment>
