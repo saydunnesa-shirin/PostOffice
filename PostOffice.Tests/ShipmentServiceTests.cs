@@ -108,7 +108,7 @@ public class ShipmentServiceTests
         _shipmentRepository.VerifyNoOtherCalls();
     }
 
-    private ShipmentRequest SetUpShipmentRequest()
+    private static ShipmentRequest SetUpShipmentRequest()
     {
         return new ShipmentRequest()
         {
@@ -119,7 +119,7 @@ public class ShipmentServiceTests
             Status = Status.Initial
         };
     }
-    private ShipmentUpdateRequest SetUpShipmentUpdateRequest()
+    private static ShipmentUpdateRequest SetUpShipmentUpdateRequest()
     {
         return new ShipmentUpdateRequest()
         {
@@ -146,7 +146,7 @@ public class ShipmentServiceTests
             }
         );
     }
-    private IEnumerable<Shipment> GetShipments()
+    private static IEnumerable<Shipment> GetShipments()
     {
         return new List<Shipment>
         {

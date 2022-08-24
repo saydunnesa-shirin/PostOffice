@@ -1,7 +1,10 @@
-﻿using FluentValidation;
+﻿using System.Collections;
+using System.Text.RegularExpressions;
+using FluentValidation;
 using PostOffice.Common;
 using PostOffice.Common.Requests;
-using System.Text.RegularExpressions;
+
+namespace PostOffice.Api.Validation;
 
 public class ShipmentRequestValidator : AbstractValidator<ShipmentRequest>
 {
@@ -11,14 +14,14 @@ public class ShipmentRequestValidator : AbstractValidator<ShipmentRequest>
             .Cascade(CascadeMode.StopOnFirstFailure)
             .NotNull().NotEmpty()
             .WithMessage("Please enter shipment number")
-            .Must((shipmentNumber) => IsValidShipmentNumber(shipmentNumber))
+            .Must(IsValidShipmentNumber)
             .WithMessage("Please enter shipment number in correct format");
 
         RuleFor(x => x.FlightNumber)
             .Cascade(CascadeMode.StopOnFirstFailure)
             .NotNull().NotEmpty()
             .WithMessage("Please enter flight number")
-            .Must((flightNumber) => IsValidFlightNumber(flightNumber))
+            .Must(IsValidFlightNumber)
             .WithMessage("Please enter flight number in correct format");
 
         RuleFor(x => x.Airport).NotNull().NotEmpty().WithMessage("Please select the airport");
@@ -26,43 +29,35 @@ public class ShipmentRequestValidator : AbstractValidator<ShipmentRequest>
 
         RuleFor(x => x.Status)
             .Cascade(CascadeMode.StopOnFirstFailure)
-            .Must((ShipmentRequest, Status) => BeAValidBags(ShipmentRequest.BagIds, Status))
+            .Must((shipmentRequest, status) => shipmentRequest.BagIds != null && BeAValidBags(shipmentRequest.BagIds, status))
             .WithMessage("Please add bags") 
-            .Must((shipment, Status) => BeAValidDateWhenFinalize(shipment.FlightDate, Status))
+            .Must((shipment, status) => BeAValidDateWhenFinalize(shipment.FlightDate, status))
             .WithMessage("Please add valid date");
     }
 
     public static bool IsValidShipmentNumber(string shipmentNumber)
     {
-        var regex = "^[0-9a-zA-Z]{3}-[0-9a-zA-Z]{6}$";
+        const string regex = "^[0-9a-zA-Z]{3}-[0-9a-zA-Z]{6}$";
         return shipmentNumber.Trim().Length == 10 && Regex.IsMatch(shipmentNumber, regex);
     }
 
     public static bool IsValidFlightNumber(string flightNumber)
     {
-        var regex = "^[a-zA-Z]{2}[0-9]{4}$";
+        const string regex = "^[a-zA-Z]{2}[0-9]{4}$";
         return flightNumber.Trim().Length == 6 && Regex.IsMatch(flightNumber, regex);
     }
 
-    private bool BeAValidDate(DateTime date)
+    private static bool BeAValidDate(DateTime date)
     {
         return !date.Equals(default(DateTime));
     }
 
-    private bool BeAValidBags(List<int> bagIds, Status status)
+    private static bool BeAValidBags(ICollection? bagIds, Status status)
     {
-        if (status == Status.Finalized && (bagIds == null || (bagIds != null && bagIds.Count == 0)))
-            return false;
-
-        return true;
+        return status != Status.Finalized || (bagIds != null && bagIds.Count != 0);
     }
-    private bool BeAValidDateWhenFinalize(DateTime date, Status status)
+    private static bool BeAValidDateWhenFinalize(DateTime date, Status status)
     {
-        if (status == Status.Finalized && date < DateTime.Now.AddHours(1))
-            return false;
-
-        return true;
+        return status != Status.Finalized || date >= DateTime.Now.AddHours(1);
     }
 }
-
-

@@ -1,7 +1,8 @@
-﻿using FluentValidation;
-using PostOffice.Common;
+﻿using System.Text.RegularExpressions;
+using FluentValidation;
 using PostOffice.Common.Requests;
-using System.Text.RegularExpressions;
+
+namespace PostOffice.Api.Validation;
 
 public class ParcelRequestValidator : AbstractValidator<ParcelRequest>
 {
@@ -11,30 +12,28 @@ public class ParcelRequestValidator : AbstractValidator<ParcelRequest>
             .Cascade(CascadeMode.StopOnFirstFailure)
             .NotNull().NotEmpty()
             .WithMessage("Please enter parcel number")
-            .Must((parcelNumber) => IsValidParcelNumber(parcelNumber))
+            .Must(IsValidParcelNumber)
             .WithMessage("Please enter parcel number in correct format");
 
         RuleFor(x => x.RecipientName).MaximumLength(100);
 
         RuleFor(x => x.DestinationCountry)
-            .Must((destinationCountry) => IsValidDestinationCountry(destinationCountry))
+            .Must(IsValidDestinationCountry)
             .WithMessage("Please enter destination country in correct format");
 
-        RuleFor(x => x.Weight).NotNull().NotEmpty().ScalePrecision(3, 10).WithMessage("Weight cannot be empty and maximum precison of 3");
-        RuleFor(x => x.Price).NotNull().NotEmpty().ScalePrecision(2, 10).WithMessage("Price cannot be empty and maximum precison of 2");
+        RuleFor(x => x.Weight).NotNull().NotEmpty().ScalePrecision(3, 10).WithMessage("Weight cannot be empty and maximum precision of 3");
+        RuleFor(x => x.Price).NotNull().NotEmpty().ScalePrecision(2, 10).WithMessage("Price cannot be empty and maximum precision of 2");
     }
 
     public static bool IsValidParcelNumber(string parcelNumber)
     {
-        var regex = "^[a-zA-Z]{2}[0-9]{6}[a-zA-Z]{2}$";
+        const string regex = "^[a-zA-Z]{2}[0-9]{6}[a-zA-Z]{2}$";
         return parcelNumber.Trim().Length == 10 && Regex.IsMatch(parcelNumber, regex);
     }
 
     public static bool IsValidDestinationCountry(string destinationCountry)
     {
-        var regex = "^[a-zA-Z]{2}$";
+        const string regex = "^[a-zA-Z]{2}$";
         return destinationCountry.Trim().Length == 2 && Regex.IsMatch(destinationCountry, regex);
     }
 }
-
-

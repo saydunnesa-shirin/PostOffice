@@ -112,7 +112,7 @@ public class BagServiceTests
         _bagRepository.VerifyNoOtherCalls();
     }
 
-    private BagRequest SetUpBagRequest()
+    private static BagRequest SetUpBagRequest()
     {
         return new BagRequest()
         {
@@ -124,7 +124,7 @@ public class BagServiceTests
             ShipmentId = 1
         };
     }
-    private BagRequest SetUpBagUpdateRequest()
+    private static BagRequest SetUpBagUpdateRequest()
     {
         return new BagRequest()
         {
@@ -152,7 +152,7 @@ public class BagServiceTests
             }
         );
     }
-    private IEnumerable<Bag> GetBags()
+    private static IEnumerable<Bag> GetBags()
     {
         return new List<Bag>
         {

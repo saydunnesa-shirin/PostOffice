@@ -1,6 +1,3 @@
-using PostOffice.Common.Requests;
-using PostOffice.Repository.Entities;
-using System.Threading.Tasks;
 using System.Transactions;
 
 namespace PostOffice.Service.Services;
@@ -34,13 +31,7 @@ public class BagService : IBagService
     {
         var bags = await _bagRepository.GetAllAsync();
 
-        List<BagResponse> responses = new List<BagResponse>();
-
-        foreach (var bag in bags)
-        {
-            responses.Add(_mapper.Map<BagResponse>(bag));
-        }
-        return responses;
+        return bags.Select(bag => _mapper.Map<BagResponse>(bag)).ToList();
     }
 
     public async Task<BagResponse> GetByIdAsync(int id)
@@ -54,122 +45,117 @@ public class BagService : IBagService
 
     public async Task<int> CreateAsync(BagRequest model)
     {
-        if (model == null) throw new ArgumentNullException("model");
+        if (model == null) throw new ArgumentNullException(nameof(model));
 
-        using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        try
         {
-            try
+            // map model to new Bag object
+            var bag = _mapper.Map<Bag>(model);
+
+            // save Bag
+            var bagId = await _bagRepository.CreateAsync(bag);
+
+            // update parcels
+            if (bagId > 0 && model.ParcelIds != null && model.ParcelIds.Count > 0)
             {
-                // map model to new Bag object
-                var bag = _mapper.Map<Bag>(model);
-
-                // save Bag
-                var bagId = await _bagRepository.CreateAsync(bag);
-
-                // update parcels
-                if (bagId > 0 && model.ParcelIds != null && model.ParcelIds.Count > 0)
+                foreach (var parcelId in model.ParcelIds)
                 {
-                    foreach (var parcelId in model.ParcelIds)
-                    {
-                        var parcel = await _parcelRepository.GetByIdAsync(parcelId);
-                        parcel.BagId = bagId;
-                        await _parcelRepository.UpdateAsync(parcel);
-                    }
+                    var parcel = await _parcelRepository.GetByIdAsync(parcelId);
+                    parcel.BagId = bagId;
+                    await _parcelRepository.UpdateAsync(parcel);
                 }
+            }
 
-                transaction.Complete();
-                return bagId;
-            }
-            catch (Exception)
-            {
-                transaction.Dispose();
-                throw;
-            }
+            transaction.Complete();
+            return bagId;
+        }
+        catch (Exception)
+        {
+            transaction.Dispose();
+            throw;
         }
     }
 
     public async Task<bool> UpdateAsync(BagRequest model)
     {
-        if (model == null) throw new ArgumentNullException("model");
+        if (model == null) throw new ArgumentNullException(nameof(model));
 
-        using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        try
         {
-            try
+            var shipmentId = model.ShipmentId > 0 ? model.ShipmentId : 0;
+            var isValid = await IsValid(model);
+            if (!isValid)
+                return false;
+
+            // copy model to Bag and update
+            var bag = _mapper.Map<Bag>(model);
+            var result = await _bagRepository.UpdateAsync(bag);
+
+            if (result && model.ParcelIds != null && model.ParcelIds.Count > 0)
             {
-                var shipmentId = model.ShipmentId > 0 ? model.ShipmentId : 0;
-                var isValid = await IsValid(model);
-                if (!isValid)
-                    return false;
+                var existingParcels = await _parcelRepository.GetAllByBagIdAsync(model.BagId);
 
-                // copy model to Bag and update
-                var bag = _mapper.Map<Bag>(model);
-                var result = await _bagRepository.UpdateAsync(bag);
+                var parcels = await _parcelRepository.GetAllAsync(model.ParcelIds);
 
-                if (result && model.ParcelIds != null && model.ParcelIds.Count > 0)
+                var existing = existingParcels.ToList();
+
+                var newParcels = parcels.ToList();
+                var parcelsToAdd = newParcels.Except(existing).ToList();
+                var parcelsToRemove = existing.Except(newParcels).ToList();
+
+                foreach (var parcel in parcelsToAdd)
                 {
-                    var existingParcels = await _parcelRepository.GetAllByBagIdAsync(model.BagId);
-
-                    var parcels = await _parcelRepository.GetAllAsync(model.ParcelIds);
-
-                    var existingParcelIds = existingParcels.Select(x => x.ParcelId).ToList();
-
-                    var parcelsToAdd = parcels.Except(existingParcels).ToList();
-                    var parcelsToRemove = existingParcels.Except(parcels).ToList();
-
-                    foreach (var parcel in parcelsToAdd)
-                    {
-                        parcel.BagId = model.BagId;
-                        result = await _parcelRepository.UpdateAsync(parcel);
-                    }
-
-                    foreach (var parcel in parcelsToRemove)
-                    {
-                        parcel.BagId = null;
-                        result = await _parcelRepository.UpdateAsync(parcel);
-                    }
+                    parcel.BagId = model.BagId;
+                    result = await _parcelRepository.UpdateAsync(parcel);
                 }
 
-                transaction.Complete();
-                return result;
+                foreach (var parcel in parcelsToRemove)
+                {
+                    parcel.BagId = null;
+                    result = await _parcelRepository.UpdateAsync(parcel);
+                }
             }
-            catch (Exception)
-            {
-                transaction.Dispose();
-                throw;
-            }
+
+            transaction.Complete();
+            return result;
+        }
+        catch (Exception)
+        {
+            transaction.Dispose();
+            throw;
         }
     }
 
     public async Task<bool> DeleteAsync(int id)
     {
-        using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        try
         {
-            try
+            var model = await GetByIdAsync(id);
+
+            var shipment = await _shipmentRepository.GetByIdAsync(model.ShipmentId);
+            if (shipment != null && shipment.Status == Status.Finalized)
+                return false;
+
+            var parcels = await _parcelRepository.GetAllByBagIdAsync(id);
+
+            foreach (var parcel in parcels)
             {
-                var model = await GetByIdAsync(id);
-
-                var shipment = await _shipmentRepository.GetByIdAsync(model.ShipmentId);
-                if (shipment != null && shipment.Status == Status.Finalized)
-                    return false;
-
-                var parcels = await _parcelRepository.GetAllByBagIdAsync(id);
-
-                foreach (var parcel in parcels)
-                {
-                    parcel.BagId = null;
-                    await _parcelRepository.UpdateAsync(parcel);
-                }
-
-                var result = await _bagRepository.DeleteAsync(id);
-
-                transaction.Complete();
-                return result;
+                parcel.BagId = null;
+                await _parcelRepository.UpdateAsync(parcel);
             }
-            catch (Exception)
-            {
-                transaction.Dispose();
-                throw;
-            }
+
+            var result = await _bagRepository.DeleteAsync(id);
+
+            transaction.Complete();
+            return result;
+        }
+        catch (Exception)
+        {
+            transaction.Dispose();
+            throw;
         }
     }
 

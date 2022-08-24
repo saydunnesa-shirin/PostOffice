@@ -1,48 +1,49 @@
-﻿namespace PostOffice.Controllers;
-
-using FluentValidation;
+﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using PostOffice.Api.Validation;
 using PostOffice.Common.Requests;
 using PostOffice.Common.Responses;
 using PostOffice.Service.Services;
+
+namespace PostOffice.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
 public class ParcelsController : ControllerBase
 {
     private readonly ILogger<ParcelsController> _logger;
-    private IParcelService _ParcelService;
+    private readonly IParcelService _parcelService;
 
     public ParcelsController(ILogger<ParcelsController> logger,
-        IParcelService ParcelService)
+        IParcelService parcelService)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _ParcelService = ParcelService ?? throw new ArgumentNullException(nameof(ParcelService));
+        _parcelService = parcelService ?? throw new ArgumentNullException(nameof(parcelService));
     }
 
     [HttpGet]
     public async Task<IEnumerable<ParcelResponse>> GetAllAsync()
     {
-        var Parcels = await _ParcelService.GetAllAsync();
+        var parcels = await _parcelService.GetAllAsync();
         _logger.LogInformation("Got Parcel List.");
-        return Parcels;
+        return parcels;
     }
 
     [HttpGet("{id}")]
     public async Task<ParcelResponse> GetByIdAsync(int id)
     {
-        var Parcel = await _ParcelService.GetByIdAsync(id);
+        var parcel = await _parcelService.GetByIdAsync(id);
         _logger.LogInformation("Got Parcel data.");
-        return Parcel;
+        return parcel;
     }
 
     [HttpPost]
     public async Task<IActionResult> CreateAsync(ParcelRequest model)
     {
-        ParcelRequestValidator validation = new ParcelRequestValidator();
-        validation.ValidateAndThrow(model);
+        var validation = new ParcelRequestValidator();
+        await validation.ValidateAndThrowAsync(model);
 
-        var result = await _ParcelService.CreateAsync(model);
+        var result = await _parcelService.CreateAsync(model);
 
         string message;
 
@@ -61,10 +62,13 @@ public class ParcelsController : ControllerBase
     [HttpPut]
     public async Task<IActionResult> UpdateAsync(ParcelRequest model)
     {
-        var result = await _ParcelService.UpdateAsync(model);
+        var validation = new ParcelRequestValidator();
+        await validation.ValidateAndThrowAsync(model);
+
+        var result = await _parcelService.UpdateAsync(model);
         string message;
 
-        if (result == true)
+        if (result)
         {
             message = "Parcel updated.";
             _logger.LogInformation(message);
@@ -79,10 +83,10 @@ public class ParcelsController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAsync(int id)
     {
-        var result = await _ParcelService.DeleteAsync(id);
+        var result = await _parcelService.DeleteAsync(id);
         string message;
 
-        if (result == true)
+        if (result)
         {
             message = "Parcel deleted.";
             _logger.LogInformation(message);

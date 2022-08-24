@@ -1,17 +1,18 @@
-﻿namespace PostOffice.Controllers;
-
-using FluentValidation;
+﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using PostOffice.Api.Validation;
 using PostOffice.Common.Requests;
 using PostOffice.Common.Responses;
 using PostOffice.Service.Services;
+
+namespace PostOffice.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
 public class BagsController : ControllerBase
 {
     private readonly ILogger<BagsController> _logger;
-    private IBagService _bagService;
+    private readonly IBagService _bagService;
 
     public BagsController(ILogger<BagsController> logger,
         IBagService bagService)
@@ -39,8 +40,8 @@ public class BagsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateAsync(BagRequest model)
     {
-        BagRequestValidator validation = new BagRequestValidator();
-        validation.ValidateAndThrow(model);
+        var validation = new BagRequestValidator();
+        await validation.ValidateAndThrowAsync(model);
 
         var result = await _bagService.CreateAsync(model);
         string message;
@@ -60,13 +61,13 @@ public class BagsController : ControllerBase
     [HttpPut]
     public async Task<IActionResult> UpdateAsync(BagRequest model)
     {
-        BagRequestValidator validation = new BagRequestValidator();
-        validation.ValidateAndThrow(model);
+        var validation = new BagRequestValidator();
+        await validation.ValidateAndThrowAsync(model);
 
         var result = await _bagService.UpdateAsync(model);
         string message;
 
-        if (result == true)
+        if (result)
         {
             message = "Bag updated.";
             _logger.LogInformation(message);
@@ -84,7 +85,7 @@ public class BagsController : ControllerBase
         var result = await _bagService.DeleteAsync(id);
         string message;
 
-        if (result == true)
+        if (result)
         {
             message = "Bag deleted.";
             _logger.LogInformation(message);

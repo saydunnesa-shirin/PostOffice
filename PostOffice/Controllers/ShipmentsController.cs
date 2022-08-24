@@ -1,17 +1,18 @@
-﻿namespace PostOffice.Controllers;
-
-using FluentValidation;
+﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using PostOffice.Api.Validation;
 using PostOffice.Common.Requests;
 using PostOffice.Common.Responses;
 using PostOffice.Service.Services;
+
+namespace PostOffice.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
 public class ShipmentsController : ControllerBase
 {
     private readonly ILogger<ShipmentsController> _logger;
-    private IShipmentService _shipmentService;
+    private readonly IShipmentService _shipmentService;
 
     public ShipmentsController(ILogger<ShipmentsController> logger,
         IShipmentService shipmentService)
@@ -23,24 +24,24 @@ public class ShipmentsController : ControllerBase
     [HttpGet]
     public async Task<IEnumerable<ShipmentResponse>> GetAllAsync()
     {
-        var Shipments = await _shipmentService.GetAllAsync();
+        var shipments = await _shipmentService.GetAllAsync();
         _logger.LogInformation("Got Shipment list.");
-        return Shipments;
+        return shipments;
     }
 
     [HttpGet("{id}")]
     public async Task<ShipmentResponse> GetByIdAsync(int id)
     {
-        var Shipment = await _shipmentService.GetByIdAsync(id);
+        var shipment = await _shipmentService.GetByIdAsync(id);
         _logger.LogInformation("Got Shipment data.");
-        return Shipment;
+        return shipment;
     }
 
     [HttpPost]
     public async Task<IActionResult> CreateAsync(ShipmentRequest model)
     {
-        ShipmentRequestValidator validation = new ShipmentRequestValidator();
-        validation.ValidateAndThrow(model);
+        var validation = new ShipmentRequestValidator();
+        await validation.ValidateAndThrowAsync(model);
 
         var result = await _shipmentService.CreateAsync(model);
 
@@ -61,14 +62,14 @@ public class ShipmentsController : ControllerBase
     [HttpPut]
     public async Task<IActionResult> UpdateAsync(ShipmentUpdateRequest model)
     {
-        ShipmentRequestValidator validation = new ShipmentRequestValidator();
-        validation.ValidateAndThrow(model);
+        var validation = new ShipmentRequestValidator();
+        await validation.ValidateAndThrowAsync(model);
 
         var result = await _shipmentService.UpdateAsync(model);
 
         string message;
 
-        if (result == true)
+        if (result)
         {
             message = "Shipment updated.";
             _logger.LogInformation(message);
@@ -87,7 +88,7 @@ public class ShipmentsController : ControllerBase
 
         string message;
 
-        if (result == true)
+        if (result)
         {
             message = "Shipment deleted.";
             _logger.LogInformation(message);

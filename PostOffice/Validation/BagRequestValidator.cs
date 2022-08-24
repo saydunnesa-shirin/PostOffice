@@ -1,7 +1,9 @@
-﻿using FluentValidation;
+﻿using System.Collections;
+using FluentValidation;
 using PostOffice.Common;
 using PostOffice.Common.Requests;
-using System.Text.RegularExpressions;
+
+namespace PostOffice.Api.Validation;
 
 public class BagRequestValidator : AbstractValidator<BagRequest>
 {
@@ -12,18 +14,16 @@ public class BagRequestValidator : AbstractValidator<BagRequest>
             .NotNull().NotEmpty()
             .WithMessage("Please enter bag number")
             .MaximumLength(15);
-            //.Matches("^[a-zA-Z]?$")
-            //.Must((bagNumber) => IsValidBagNumber(bagNumber))
-            //.WithMessage("Please enter bag number in correct format");
+        
 
         RuleFor(x => x.ContentType)
             .Cascade(CascadeMode.StopOnFirstFailure)
             .NotNull().NotEmpty()
             .WithMessage("Please letters or parcels")
             
-            .Must((bag, ContentType) => BeAValidBagWithLetters(bag.ParcelIds, ContentType))
-            .WithMessage("Parcel cann't be added with the this bag")
-            .Must((bag, ContentType) => BeAValidBagWithParcel(bag.ParcelIds, ContentType))
+            .Must((bag, contentType) => bag.ParcelIds != null && BeAValidBagWithLetters(bag.ParcelIds, contentType))
+            .WithMessage("Parcel cannot be added with the this bag")
+            .Must((bag, contentType) => bag.ParcelIds != null && BeAValidBagWithParcel(bag.ParcelIds, contentType))
             .WithMessage("Please add Parcel");
 
         RuleFor(x => x.ItemCount)
@@ -49,12 +49,12 @@ public class BagRequestValidator : AbstractValidator<BagRequest>
         RuleFor(x => x.Weight).NotNull().NotEmpty().GreaterThan(0)
             .ScalePrecision(3, 10)
             .When(b => b.ContentType == ContentType.Letter)
-            .WithMessage("Weight cannot be empty and must be a precison of 3");
+            .WithMessage("Weight cannot be empty and must be a precision of 3");
 
         RuleFor(x => x.Price).NotNull().NotEmpty().GreaterThan(0)
             .ScalePrecision(2, 10)
             .When(b => b.ContentType == ContentType.Letter)
-            .WithMessage("Price cannot be empty and must be a precison of 2");
+            .WithMessage("Price cannot be empty and must be a precision of 2");
 
         RuleFor(x => x.ItemCount)
             .Cascade(CascadeMode.StopOnFirstFailure)
@@ -65,25 +65,13 @@ public class BagRequestValidator : AbstractValidator<BagRequest>
 
     }
 
-    public static bool IsValidBagNumber(string bagNumber)
+    private static bool BeAValidBagWithParcel(ICollection? parcelIds, ContentType contentType)
     {
-        var regex = "^[a-zA-Z][0-9]$";
-        return bagNumber.Trim().Length <= 15 && Regex.IsMatch(bagNumber, regex);
+        return contentType != ContentType.Parcel || (parcelIds != null && parcelIds.Count > 0);
     }
 
-    private bool BeAValidBagWithParcel(List<int> parcelIds, ContentType contentType)
+    private bool BeAValidBagWithLetters(ICollection? parcelIds, ContentType contentType)
     {
-        if (contentType == ContentType.Parcel && (parcelIds == null || (parcelIds != null && parcelIds.Count == 0)))
-            return false;
-        return true;
-    }
-
-    private bool BeAValidBagWithLetters(List<int> parcelIds, ContentType contentType)
-    {
-        if (contentType == ContentType.Letter && parcelIds != null && parcelIds.Count > 0)
-            return false;
-        return true;
+        return contentType != ContentType.Letter || parcelIds == null || parcelIds.Count <= 0;
     }
 }
-
-

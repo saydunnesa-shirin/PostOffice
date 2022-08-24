@@ -69,7 +69,7 @@ public class ParcelServiceTests
         _parcelRepository.VerifyNoOtherCalls();
     }
 
-    private ParcelRequest SetUpParcelRequest()
+    private static ParcelRequest SetUpParcelRequest()
     {
         return new ParcelRequest()
         {
@@ -80,7 +80,7 @@ public class ParcelServiceTests
             DestinationCountry = "EE",
         };
     }
-    private ParcelRequest SetUpParcelUpdateRequest()
+    private static ParcelRequest SetUpParcelUpdateRequest()
     {
         return new ParcelRequest()
         {
@@ -107,7 +107,7 @@ public class ParcelServiceTests
             }
         );
     }
-    private IEnumerable<Parcel> GetParcels()
+    private static IEnumerable<Parcel> GetParcels()
     {
         return new List<Parcel>
         {

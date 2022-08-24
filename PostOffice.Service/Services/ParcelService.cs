@@ -24,7 +24,7 @@ public class ParcelService : IParcelService
     {
         var parcels = await _parcelRepository.GetAllAsync();
 
-        List<ParcelResponse> responses = new List<ParcelResponse>();
+        var responses = new List<ParcelResponse>();
 
         foreach (var parcel in parcels)
         {

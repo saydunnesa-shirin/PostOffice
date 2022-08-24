@@ -5,7 +5,6 @@ using PostOffice.Repository.Helpers;
 using PostOffice.Repository.Repositories;
 using PostOffice.Service.Services;
 using PostOffice.Common.Exceptions;
-using Microsoft.AspNetCore.Builder;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +13,6 @@ var builder = WebApplication.CreateBuilder(args);
     var services = builder.Services;
     var env = builder.Environment;
 
-    //var databaseConnectionString = Configuration.GetConnectionString("WebApiDatabase");
     services.AddDbContext<DataContext>(options =>
                 options.UseSqlServer("Server=SHIRINLENOVO;Database=PostOffice;Trusted_Connection=True;MultipleActiveResultSets=true"));
     services.AddCors();
