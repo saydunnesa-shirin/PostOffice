@@ -69,7 +69,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:4000/Shipments/4",
+					"raw": "http://localhost:4000/Shipments/1",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -77,7 +77,7 @@
 					"port": "4000",
 					"path": [
 						"Shipments",
-						"4"
+						"1"
 					]
 				}
 			},
@@ -90,7 +90,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"ShipmentNumber\": \"SNB-193029\",\r\n    \"FlightNumber\": \"LA0001\",\r\n    \"FlightDate\": \"2022-08-19T13:07:09\",\r\n    \"Airport\": 2,\r\n    \"Status\": 1,\r\n    \"BagIds\": [1,3]\r\n}",
+					"raw": "{\r\n    \"ShipmentNumber\": \"SNB-193029\",\r\n    \"FlightNumber\": \"LA0001\",\r\n    \"FlightDate\": \"2022-08-19T13:07:09\",\r\n    \"Airport\": 2,\r\n    \"Status\": 1,\r\n    \"BagIds\": [1,2]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -118,7 +118,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"BagNumber\": \"ABCDE666\",\r\n    \"ContentType\": 1,\r\n    \"Weight\": 0,\r\n    \"Price\": 0,\r\n    \"ItemCount\": 0,\r\n    \"ShipmentId\": null,\r\n    \"ParcelIds\" : [15]\r\n    \r\n}",
+					"raw": "{\r\n    \"BagNumber\": \"ABCDE666\",\r\n    \"ContentType\": 1,\r\n    \"Weight\": 0,\r\n    \"Price\": 0,\r\n    \"ItemCount\": 0,\r\n    \"ShipmentId\": null,\r\n    \"ParcelIds\" : [1]\r\n    \r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -146,7 +146,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"ParcelNumber\": \"AB123496NM\",\r\n    \"RecipientName\": \"Shirin\",\r\n    \"DestinationCountry\": \"BD\",\r\n    \"Weight\": 19.578,\r\n    \"Price\": 19.25,\r\n    \"BagId\": null\r\n}",
+					"raw": "{\r\n    \"parcelNumber\": \"AB123411NM\",\r\n    \"recipientName\": \"Sum soon\",\r\n    \"destinationCountry\": \"BD\",\r\n    \"weight\": 19.58,\r\n    \"price\": 19.25,\r\n    \"bagId\": null\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -174,7 +174,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"shipmentId\": 28,\r\n    \"shipmentNumber\": \"STP-193029\",\r\n    \"airport\": \"Rix\",\r\n    \"flightNumber\": \"LX0001\",\r\n    \"flightDate\": \"2022-08-19T13:07:09\",\r\n    \"bagIds\": [16],\r\n    \"status\": \"Initial\"\r\n}",
+					"raw": "{\r\n    \"shipmentId\": 1,\r\n    \"ShipmentNumber\": \"SNB-193029\",\r\n    \"FlightNumber\": \"LA0001\",\r\n    \"FlightDate\": \"2022-08-19T13:07:09\",\r\n    \"Airport\": 2,\r\n    \"Status\": 1,\r\n    \"BagIds\": []\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -202,7 +202,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"bagId\": 16,\r\n        \"bagNumber\": \"ABCDERGH\",\r\n        \"contentType\": \"Letter\",\r\n        \"weight\": 23.87,\r\n        \"price\": 19.78,\r\n        \"itemCount\": 6,\r\n        \"shipmentId\": null,\r\n        \"parcelIds\": []\r\n}",
+					"raw": "{\r\n    \"BagNumber\": \"ABCDE666\",\r\n    \"ContentType\": 1,\r\n    \"Weight\": 0,\r\n    \"Price\": 0,\r\n    \"ItemCount\": 0,\r\n    \"ShipmentId\": null,\r\n    \"ParcelIds\" : []\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -230,7 +230,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"parcelId\": 13,\r\n    \"parcelNumber\": \"AB123496NM\",\r\n    \"recipientName\": \"Sum soon\",\r\n    \"destinationCountry\": \"BD\",\r\n    \"weight\": 19.58,\r\n    \"price\": 19.25,\r\n    \"bagId\": 0\r\n}",
+					"raw": "{\r\n    \"parcelId\": 1,\r\n    \"parcelNumber\": \"AB123411NM\",\r\n    \"recipientName\": \"Sum soon\",\r\n    \"destinationCountry\": \"BD\",\r\n    \"weight\": 19.58,\r\n    \"price\": 19.25,\r\n    \"bagId\": null\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
