@@ -1,6 +1,6 @@
 ﻿using ContentType = PostOffice.Common.ContentType;
 
-namespace PostOffice.Tests;
+namespace PostOffice.Service.Tests;
 
 public class BagServiceTests
 {

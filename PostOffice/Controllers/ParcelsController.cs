@@ -79,22 +79,4 @@ public class ParcelsController : ControllerBase
         _logger.LogInformation(message);
         return BadRequest(message);
     }
-
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteAsync(int id)
-    {
-        var result = await _parcelService.DeleteAsync(id);
-        string message;
-
-        if (result)
-        {
-            message = "Parcel deleted.";
-            _logger.LogInformation(message);
-            return Ok(message);
-        }
-
-        message = "Failed to delete parcel.";
-        _logger.LogInformation(message);
-        return BadRequest(message);
-    }
 }

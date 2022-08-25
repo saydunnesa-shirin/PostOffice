@@ -1,7 +1,7 @@
 ﻿using Airport = PostOffice.Common.Airport;
 using Status = PostOffice.Common.Status;
 
-namespace PostOffice.Tests;
+namespace PostOffice.Service.Tests;
 
 public class ShipmentServiceTests
 {

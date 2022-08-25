@@ -1,0 +1,313 @@
+{
+	"info": {
+		"_postman_id": "83ab064a-0c4a-4314-bffe-c584a12e748e",
+		"name": "PostOffice",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "18801037"
+	},
+	"item": [
+		{
+			"name": "Get All Shipments",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:4000/Shipments",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"Shipments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Bags",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:4000/Bags",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"Bags"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Parcels",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:4000/Parcels",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"Parcels"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Shipment By Id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:4000/Shipments/4",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"Shipments",
+						"4"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Shipment",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"ShipmentNumber\": \"SNB-193029\",\r\n    \"FlightNumber\": \"LA0001\",\r\n    \"FlightDate\": \"2022-08-19T13:07:09\",\r\n    \"Airport\": 2,\r\n    \"Status\": 1,\r\n    \"BagIds\": [1,3]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/Shipments",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"Shipments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Bag",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"BagNumber\": \"ABCDE666\",\r\n    \"ContentType\": 1,\r\n    \"Weight\": 0,\r\n    \"Price\": 0,\r\n    \"ItemCount\": 0,\r\n    \"ShipmentId\": null,\r\n    \"ParcelIds\" : [15]\r\n    \r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/Bags",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"Bags"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Parcel",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"ParcelNumber\": \"AB123496NM\",\r\n    \"RecipientName\": \"Shirin\",\r\n    \"DestinationCountry\": \"BD\",\r\n    \"Weight\": 19.578,\r\n    \"Price\": 19.25,\r\n    \"BagId\": null\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/Parcels",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"Parcels"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Shipment",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"shipmentId\": 28,\r\n    \"shipmentNumber\": \"STP-193029\",\r\n    \"airport\": \"Rix\",\r\n    \"flightNumber\": \"LX0001\",\r\n    \"flightDate\": \"2022-08-19T13:07:09\",\r\n    \"bagIds\": [16],\r\n    \"status\": \"Initial\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/Shipments",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"Shipments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Bag",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"bagId\": 16,\r\n        \"bagNumber\": \"ABCDERGH\",\r\n        \"contentType\": \"Letter\",\r\n        \"weight\": 23.87,\r\n        \"price\": 19.78,\r\n        \"itemCount\": 6,\r\n        \"shipmentId\": null,\r\n        \"parcelIds\": []\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/Bags",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"Bags"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Parcel",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"parcelId\": 13,\r\n    \"parcelNumber\": \"AB123496NM\",\r\n    \"recipientName\": \"Sum soon\",\r\n    \"destinationCountry\": \"BD\",\r\n    \"weight\": 19.58,\r\n    \"price\": 19.25,\r\n    \"bagId\": 0\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/Parcels",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"Parcels"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Shipment",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/Shipments/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"Shipments",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Bag",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/Bags/4",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"Bags",
+						"4"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

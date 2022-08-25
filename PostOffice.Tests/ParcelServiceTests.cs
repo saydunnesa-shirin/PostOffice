@@ -1,4 +1,4 @@
-﻿namespace PostOffice.Tests;
+﻿namespace PostOffice.Service.Tests;
 
 public class ParcelServiceTests
 {

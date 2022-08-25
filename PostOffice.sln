@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PostOffice.Repository", "Po
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PostOffice.Service", "PostOffice.Service\PostOffice.Service.csproj", "{AEA964CD-9305-48B1-BE87-6F1FB591F177}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PostOffice.Tests", "PostOffice.Tests\PostOffice.Tests.csproj", "{EBC48917-C88B-4B3C-9667-D256A755A030}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PostOffice.Service.Tests", "PostOffice.Tests\PostOffice.Service.Tests.csproj", "{EBC48917-C88B-4B3C-9667-D256A755A030}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{F21BA837-AF2D-4330-8034-F202861B36E3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,6 +44,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EBC48917-C88B-4B3C-9667-D256A755A030} = {F21BA837-AF2D-4330-8034-F202861B36E3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {143D14D4-E976-45E3-83D3-4D452ACF35D9}
