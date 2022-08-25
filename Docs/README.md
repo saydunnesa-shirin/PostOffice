@@ -5,7 +5,7 @@ It is an API project for managing parcels and letters in the post office.
 Visual Studio 2022, .NET 6 API, Entity Framework Core 6, AutoMapper, FluentValidation, NUnit and Moq.
 
 ## Project Structure
-![Project Structure Image](images/project_structure.PNG)
+![Project Structure Image](images/project_structure.png)
 
 ## Data Store
 MsSqllocaldb was used for storing data and entity framework core for CRUD operation. All the entities are added to (PostOffice.Repository/Entities) folder.
@@ -15,7 +15,9 @@ DB Migration command:
     >> dotnet ef migrations add InitialCreate --project .\PostOffice\PostOffice.Api.csproj
     >> dotnet ef database update --project .\PostOffice\PostOffice.Api.csproj
 
-As DataContext and appsettings.json are in two different projects, so needed to add project information (--project .\PostOffice\PostOffice.Api.csproj) in the commands. ![Sql Migrations Image](images/sql_migrations.PNG)
+As DataContext and appsettings.json are in two different projects, so needed to add project information (--project .\PostOffice\PostOffice.Api.csproj) in the commands. 
+
+![Sql Migrations Image](images/sql_migrations.png)
 
 ## How to run
 Open the solution using visual studio 22 and run.
@@ -55,4 +57,4 @@ There are fourteen API endpoints:
 ## Postman
 A postman collection is included to call the APIs.
 
-A json script is added in this [a link] (https://github.com/saydunnesa-shirin/PM/blob/main/docs/Postman/PM.postman_collection.json) link.
+A json script is added in this [a link] (https://github.com/saydunnesa-shirin/PostOffice/blob/master/Docs/PostOffice.postman_collection.json) link.
