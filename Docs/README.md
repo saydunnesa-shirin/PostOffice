@@ -9,10 +9,15 @@ Visual Studio 2022, .NET 6 API, Entity Framework Core 6, AutoMapper, FluentValid
 
 ## Data Store
 MsSqllocaldb was used for storing data and entity framework core for CRUD operation. All the entities are added to (PostOffice.Repository/Entities) folder.
-A class called "DataContext" was used for db interaction. In PostOffice.API has the appsettings.json file, which contains db connection information. 
+A class called "DataContext" was used for db interaction. 
+
+We should install the dotnet ef tool on our machine:
+    >> dotnet tool install --global dotnet-ef
+Now we should be able to run our dotnet ef commands successfully.
+
+In PostOffice.API has the appsettings.json file, which contains db connection information. 
 DB Migration command:
 
-    >> dotnet tool install --global dotnet-ef
     >> dotnet ef migrations add InitialCreate --project .\PostOffice\PostOffice.Api.csproj
     >> dotnet ef database update --project .\PostOffice\PostOffice.Api.csproj
 
