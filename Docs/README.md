@@ -12,6 +12,7 @@ MsSqllocaldb was used for storing data and entity framework core for CRUD operat
 A class called "DataContext" was used for db interaction. In PostOffice.API has the appsettings.json file, which contains db connection information. 
 DB Migration command:
 
+    >> dotnet tool install --global dotnet-ef
     >> dotnet ef migrations add InitialCreate --project .\PostOffice\PostOffice.Api.csproj
     >> dotnet ef database update --project .\PostOffice\PostOffice.Api.csproj
 
