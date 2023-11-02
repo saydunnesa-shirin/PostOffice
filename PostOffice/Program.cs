@@ -14,7 +14,10 @@ var builder = WebApplication.CreateBuilder(args);
     var env = builder.Environment;
 
     services.AddDbContext<DataContext>(options =>
-                options.UseSqlServer("Server=SHIRINLENOVO;Database=PostOffice;Trusted_Connection=True;MultipleActiveResultSets=true"));
+                options.UseSqlServer("Server=Shirin;Database=PostOffice;Trusted_Connection=True;MultipleActiveResultSets=true"));
+
+
+    //Add CORS
     services.AddCors();
     services.AddControllers().AddJsonOptions(x =>
     {
@@ -53,3 +56,6 @@ var app = builder.Build();
 }
 
 app.Run("http://localhost:4000");
+
+//app.Run();
+
